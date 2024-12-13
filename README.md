@@ -58,7 +58,6 @@ src/
 2. Install Node.js dependencies:
    ```
    npm install
-
    ```
 3. Set up your environment variables: Create a .env file and add the following configuration:
    ```
@@ -71,16 +70,20 @@ src/
    npm run dev
    ```
    The server will run on http://127.0.0.1:8000
-   
+
+---
+
+
 ### API Testing with Postman
 
-## API Endpoints
+##### API Endpoints
 
 Set the {{url}} as http://127.0.0.1:8000
 1. Register a user (student or professor).
-   POST {{url}}/api/auth/register
+   
+   ##### POST {{url}}/api/auth/register
 
-   Body :
+   ##### Body :
    ```
    {
      "name": "Steve Smith",
@@ -89,35 +92,109 @@ Set the {{url}} as http://127.0.0.1:8000
      "role": "professor"
    }
    ```
-   Response
-3. Logs in a user (student or professor).
-   POST {{url}}/api/auth/login
+   ##### Response:
    ```
-   npm install
+   {  
+     "token": "JWT_TOKEN"  
+   }
+   ```
+2. Logs in a user (student or professor).
+   
+   ##### POST {{url}}/api/auth/login
+   ##### Body : 
+   ```
+   {  
+     "email": "user@example.com",  
+     "password": "password123"  
+   }
+   ```
+   ##### Response :
+   ```
+   {  
+     "token": "JWT_TOKEN"  
+   }  
+   ```
+   
+3. Creates a new availability slot for a professor.(only professeors)
+   ##### POST {{url}}/api/availability
+   ##### Headers : Authorization: Bearer <JWT_TOKEN>
+   ##### Body :
+   ```
+      {  
+     "date": "2024-01-20",  
+     "startTime": "10:00",  
+     "endTime": "11:00"  
+      }
+   ```
+4. Get Available Slots
+   ##### GET {{url}}/api/availability
+  
+   ##### Query Parameters: professorId=<PROFESSOR_ID>
+   ##### Headers: Authorization: Bearer <JWT_TOKEN>
 
+5. Book Appointment (Student Only)
+
+   ##### POST /api/appointments/book
+   ##### Headers: Authorization: Bearer <JWT_TOKEN>
+   ##### Body:
    ```
-4. Creates a new availability slot for a professor.
-   POST {{url}}/api/availability
+   {  
+     "availabilityId": "AVAILABILITY_ID",  
+     "professorId": "PROFESSOR_ID"  
+   }
    ```
-   PORT=8000
-   MONGO_URI=your_mongo_db_connection_string
-   JWT_SECRET=your_jwt_secret_key
+6. View Appointments
+   
+   ##### GET /api/appointments
+   ##### Headers: Authorization: Bearer <JWT_TOKEN>
+   
+7. Cancel Appointment (Professor Only)
+   id is the appointment id, add that to path variable
+
+   ##### DELETE /api/appointments/:id/cancel
+   
+   ##### Headers: Authorization: Bearer <JWT_TOKEN>
+
+---
+
+### Automated End-to-End Test
+
+## Steps to Run
+1. Install Test Dependencies:
    ```
-5. POST {{url}}/api/availability
+   npm install --save-dev mongodb-memory-server jest supertest
    ```
-   npm run dev
+3. Run Tests:
    ```
-6. POST {{url}}/api/appointments/book
+   npm test --appointmentFlow.test.js
    ```
-   npm run dev
-   ```
-7. GET {{url}}/api/appointments
-   ```
-   npm run dev
-   ```
-8. DELETE {{url}}/api/appointments/:id/cancel
-   ```
-   ```
+# Test Coverage
+The test validates the following flow:
+
+- Student A1 logs in.
+- Professor P1 logs in and adds time slots.
+- Student A1 books an appointment with Professor P1.
+- Student A2 books another slot with Professor P1.
+- Professor P1 cancels Student A1's appointment.
+- Student A1 checks their appointments to confirm cancellation.
+
+### Challenges and Solutions 🧩
+- Authentication Handling
+Challenge: Ensuring secure authentication for both students and professors.
+Solution: Implemented JWT authentication with a middleware to protect API routes.
+- Error Handling
+Challenge: Managing various error scenarios like invalid data, unauthorized access, etc.
+Solution: Implemented custom error messages and status codes to improve the user experience.
+
+### Future Improvements 🚀
+- User Roles: Extend functionality to include different user roles (e.g., admin).
+- UI Frontend: Create a React or Angular frontend for a user-friendly interface.
+- Real-Time Updates: Add WebSocket support for real-time appointment updates.
+### Video Demonstration 📽️
+
+ 1. Automated test case running - https://drive.google.com/file/d/1OCKa3u44LMrYwrXNiHnyyXwCsVZV9l8d/view?usp=drive_link
+ 2. Demonstrating the user flow manually through Postman - https://drive.google.com/file/d/1C-LJ4sttd-T7RdQzpF4y5GzRsYVhHvZr/view?usp=drive_link
+
    
    
 
